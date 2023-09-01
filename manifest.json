@@ -1,0 +1,20 @@
+{
+  "manifest_version": 3,
+  "name": "Textbook PDF",
+  "version": "1.0",
+  "description": "Download textbooks as PDF from smartedu.cn",
+  "permissions": ["activeTab"],
+  "action": {
+    "default_icon": "images/icon.png",
+    "default_popup": "popup/popup.html"
+  },
+  "content_scripts": [
+    {
+      "js": ["scripts/content.js"],
+      "matches": [
+        "https://basic.smartedu.cn/tchMaterial/detail*"
+      ],
+      "run_at": "document_end"
+    }
+  ]
+}
