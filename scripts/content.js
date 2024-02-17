@@ -24,25 +24,75 @@ function downloadPDF(url, filename) {
     }
 }
 
+function insertStyle() {
+  // Create a <style> element
+  var styleElement = document.createElement('style');
+
+  // Set the CSS content
+  styleElement.innerHTML = `
+    .github-button {
+      background-color: #2ea44f;
+      color: #ffffff;
+      border: none;
+      text-align: center;
+      padding: 10px 20px;
+      font-size: 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      box-shadow: 0 2px 4px rgba(46, 164, 79, 0.4);
+      transition: background-color 0.3s ease;
+    }
+
+    .github-button:hover {
+      background-color: #22863a;
+    }
+
+    .github-button:focus {
+      outline: none;
+    }
+
+    .github-button:active {
+      background-color: #195d27;
+    }
+  `;
+
+  // Append the <style> element to the <head> of the document
+  document.head.appendChild(styleElement);
+}
+
+// Function to execute when the iframe's content window finishes loading
+function iframeContentLoaded() {
+    console.log('Iframe content loaded!');
+    // Insert a div button to .index-module_title_bnE9V
+    const title = document.querySelector('.index-module_title_bnE9V');
+    if (title) {
+        filename = title.innerText + '.pdf'
+        const div = document.createElement('div');
+        div.innerHTML = '<button class="github-button">下载</button>';
+        div.onclick = () => {
+            const iframe = document.querySelector('iframe');
+            if (iframe) {
+                const src = iframe.getAttribute('src');
+                downloadPDF(src, filename);
+            }
+        };
+        title.appendChild(div);
+    }
+}
+
 window.addEventListener("load", function load(event) {
     window.removeEventListener("load", load, false);
-    // Delay 3 secs
+    insertStyle();
+    // Delay 2 secs
     setTimeout(() => {
-        // Insert a div button to .toolBar-module_wrapper_NU9GV
-        const toolBar = document.querySelector('.toolBar-module_wrapper_NU9GV');
-        if (toolBar) {
-            const div = document.createElement('div');
-            div.innerHTML = '<span>下载</span>';
-            div.className = 'index-module_to-teach_sxbbq  toTeach-module_play-warpper_dL5cW';
-            div.onclick = () => {
-                const iframe = document.querySelector('iframe');
-                const title = document.querySelector('.index-module_title_bnE9V');
-                if (iframe) {
-                    const src = iframe.getAttribute('src');
-                    downloadPDF(src, title.innerText + '.pdf');
-                }
-            };
-            toolBar.appendChild(div);
+        // Get a reference to the iframe
+        const iframe = document.querySelector('iframe');
+        // Check if the iframe has already finished loading
+        if (iframe.contentWindow.document.readyState === 'complete') {
+            iframeContentLoaded();
+        } else {
+            // If not loaded, add an event listener to execute when the iframe's content window finishes loading
+            iframe.contentWindow.addEventListener("load", iframeContentLoaded);
         }
-    }, 1000);
+    }, 2000);
 }, false);
