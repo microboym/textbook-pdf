@@ -80,19 +80,25 @@ function iframeContentLoaded() {
     }
 }
 
+
 window.addEventListener("load", function load(event) {
-    window.removeEventListener("load", load, false);
-    insertStyle();
-    // Delay 2 secs
-    setTimeout(() => {
-        // Get a reference to the iframe
-        const iframe = document.querySelector('iframe');
-        // Check if the iframe has already finished loading
-        if (iframe.contentWindow.document.readyState === 'complete') {
-            iframeContentLoaded();
-        } else {
-            // If not loaded, add an event listener to execute when the iframe's content window finishes loading
-            iframe.contentWindow.addEventListener("load", iframeContentLoaded);
-        }
-    }, 2000);
-}, false);
+        window.removeEventListener("load", load, false);
+        insertStyle();
+        // Listen the changes of #zxxcontent
+        let observer = new MutationObserver((mutationList) => {
+                // Get a reference to the iframe
+                const iframe = document.querySelector('iframe');
+                // If iframe exists
+                if(iframe){
+                    observer.disconnect();
+                    // Check if the iframe has already finished loading
+                    if (iframe.contentWindow.document.readyState === 'complete') {
+                        iframeContentLoaded();
+                    } else {
+                        // If not loaded, add an event listener to execute when the iframe's content window finishes loading
+                        iframe.contentWindow.addEventListener("load", iframeContentLoaded);
+                    }
+                }
+            });
+        observer.observe(document.querySelector("#zxxcontent"), { childList: true, subtree: true });
+    }, false);
