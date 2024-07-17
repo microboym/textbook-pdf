@@ -24,28 +24,15 @@ function insertStyle() {
   // Set the CSS content
   styleElement.innerHTML = `
     .github-button {
-      background-color: #2ea44f;
-      color: #ffffff;
+      color: #1e62ec;
       border: none;
       text-align: center;
-      padding: 10px 20px;
-      font-size: 16px;
-      border-radius: 6px;
       cursor: pointer;
-      box-shadow: 0 2px 4px rgba(46, 164, 79, 0.4);
-      transition: background-color 0.3s ease;
+      background-color: initial;
     }
 
     .github-button:hover {
-      background-color: #22863a;
-    }
-
-    .github-button:focus {
-      outline: none;
-    }
-
-    .github-button:active {
-      background-color: #195d27;
+      color: #04366c;
     }
   `;
 
