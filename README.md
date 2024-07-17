@@ -8,7 +8,7 @@
 
 安装插件。
 
-1. 从 Release 下载并解压代码，或克隆本仓库。如下载缓慢，也可从网盘下载: [阿里云盘](https://www.alipan.com/s/8fA6JDLdKAB)
+1. 从 Release 下载并解压代码，或克隆本仓库。如下载缓慢，也可从网盘下载: [蓝奏云网盘](https://wwo.lanzouw.com/i8A8O24oul8f)
 2. 点击链接打开插件管理页面([chrome://extensions](chrome://extensions) 或 [edge://extensions](edge://extensions)), 或者点击菜单>扩展程序>管理拓展程序
 3. 点击`开发模式`开关, 开启开发模式
 4. 点击左上角的`加载已解压的扩展程序`, 选择本仓库目录
