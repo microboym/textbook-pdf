@@ -1,74 +1,88 @@
-function downloadPDF(filename) {
-    // get pdf Url
-    const params = new URLSearchParams(window.location.search);
-    const pdfUrl = 'https://r2-ndr-private.ykt.cbern.com.cn/edu_product/esp/assets/' + params.get('contentId') + '.pkg/pdf.pdf';
+// get pdf Url
+const params = new URLSearchParams(window.location.search);
+const pdfUrl = 'https://r2-ndr-private.ykt.cbern.com.cn/edu_product/esp/assets/' + params.get('contentId') + '.pkg/pdf.pdf';
 
-    const headers_str = '{"X-ND-AUTH":"MAC id=\\"7F938B205F876FC39BD5FD64A3C82167BAEF3FE82B88BD84BBB19B9EC75AF02D59C7A6D3A23E5A44203AD7FB59BFDC8A331CDC568F1B2757\\",nonce=\\"1721099029299:2DYSEZNO\\",mac=\\"d2R1T9ZTksHlEwD7 cwcTEmpSKP2IpXg2j26ZcoJQnc=\\""}'
-    const headers = JSON.parse(headers_str);
-    
+const headers_str = '{"X-ND-AUTH":"MAC id=\\"7F938B205F876FC39BD5FD64A3C82167BAEF3FE82B88BD84BBB19B9EC75AF02D59C7A6D3A23E5A44203AD7FB59BFDC8A331CDC568F1B2757\\",nonce=\\"1721099029299:2DYSEZNO\\",mac=\\"d2R1T9ZTksHlEwD7 cwcTEmpSKP2IpXg2j26ZcoJQnc=\\""}'
+const headers = JSON.parse(headers_str);
+
+function downloadPDF(filename) {
     fetch(pdfUrl, { headers })
-        .then((response) => response.blob())
-        .then((blob) => {
-                const url = URL.createObjectURL(blob);
-                const link = document.createElement('a');
-                link.href = url;
-                link.download = filename || 'textbook.pdf';
-                link.click();
-            });
+        .then((response) => response.blob()
+                .then((blob) => {
+                        const url = URL.createObjectURL(blob);
+                        const link = document.createElement('a');
+                        link.href = url;
+                        link.download = (filename || 'textbook') + '.pdf';
+                        link.click();
+                        link.remove();
+                        if (!document.cookie) setTimeout(window.close,1000);
+                        else chrome.storage.sync.get(['autoCloseTab'], (result) => {
+                                if (result['autoCloseTab']) setTimeout(window.close,1000);
+                            });
+                    }));
 }
 
 function insertStyle() {
-  // Create a <style> element
-  var styleElement = document.createElement('style');
+    // Create a <style> element
+    var styleElement = document.createElement('style');
 
-  // Set the CSS content
-  styleElement.innerHTML = `
+    // Set the CSS content
+    styleElement.innerHTML = `
     .github-button {
-      color: #1e62ec;
-      border: none;
-      text-align: center;
-      cursor: pointer;
-      background-color: initial;
+        background-color: #2ea44f;
+        color: #ffffff;
+        border: none;
+        text-align: center;
+        padding: 10px 20px;
+        font-size: 16px;
+        border-radius: 6px;
+        cursor: pointer;
+        box-shadow: 0 2px 4px rgba(46, 164, 79, 0.4);
+        transition: background-color 0.3s ease;
     }
-
     .github-button:hover {
-      color: #04366c;
+        background-color: #22863a;
     }
-  `;
+    .github-button:focus {
+        outline: none;
+    }
+    .github-button:active {
+        background-color: #195d27;
+    }
+    `;
 
-  // Append the <style> element to the <head> of the document
-  document.head.appendChild(styleElement);
+    // Append the <style> element to the <head> of the document
+    document.head.appendChild(styleElement);
 }
 
-window.addEventListener("load", function load(event) {
-        window.removeEventListener("load", load, false);
+chrome.storage.sync.get(['autoDownloadPDF'], (result) => {
+        window.addEventListener("load", function load(event) {
+                window.removeEventListener("load", load, false);
 
-        insertStyle();
-
-        // remove the fish modal
-        const fishObserver = new MutationObserver((mutationList) => {
-                const fish = document.querySelector(".fish-modal-root");
-                if (fish) {
-                    fish.remove();
-                    fishObserver.disconnect();
+                if (!document.cookie || result['autoDownloadPDF']) {
+                    const observer = new MutationObserver((mutationList) => {
+                            const title = document.querySelector("#zxxcontent > div.web-breadcrumb > div > span:nth-child(3) > span.fish-breadcrumb-link");
+                            if (title) {
+                                observer.disconnect();
+                                downloadPDF(title.innerText);
+                            }
+                        });
+                    observer.observe(document.body, { childList: true, subtree: true });
                 }
-            });
-        fishObserver.observe(document.body, { childList: true, subtree: true });
-
-        const titleObserver = new MutationObserver((mutationList) => {
-                // get title
-                const title = document.querySelector("#zxxcontent > div.web-breadcrumb > div > span:nth-child(3) > span.fish-breadcrumb-link");
-                if (title) {
-                    const filename = title.innerText + '.pdf'
-
-                    // add download button
-                    const span = document.createElement('span');
-                    span.innerHTML = '<button class="github-button">下载</button>';
-                    span.onclick = () => { downloadPDF(filename); };
-                    title.parentElement.parentElement.appendChild(span);
-
-                    titleObserver.disconnect();
+                if (document.cookie) {
+                    const oserver = new MutationObserver((mutationList) => {
+                            const title = document.querySelector('.index-module_title_bnE9V');
+                            if (title) {
+                                oserver.disconnect();
+                                // add download button
+                                insertStyle();
+                                const div = document.createElement('div');
+                                div.innerHTML = '<button class="github-button">下载</button>';
+                                div.onclick = () => { downloadPDF(title.innerText); };
+                                title.appendChild(div);
+                            }
+                        });
+                    oserver.observe(document.querySelector("#zxxcontent"), { childList: true, subtree: true });
                 }
-            });
-        titleObserver.observe(document.querySelector("#zxxcontent"), { childList: true, subtree: true });
-    }, false);
+            }, false);
+    });
