@@ -3,7 +3,7 @@
   "name": "Textbook PDF",
   "version": "1.1.1",
   "description": "Download textbooks as PDF from smartedu.cn",
-  "permissions": ["activeTab"],
+  "permissions": ["activeTab","storage"],
   "action": {
     "default_icon": "images/icon.png",
     "default_popup": "popup/popup.html"
