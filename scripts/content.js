@@ -15,7 +15,7 @@ function downloadPDF(filename) {
                         link.download = (filename || 'textbook') + '.pdf';
                         link.click();
                         link.remove();
-                        if (!document.cookie) setTimeout(window.close,1000);
+                        if (document.querySelector('.index-module_user_Zhwre')) setTimeout(window.close,1000);
                         else chrome.storage.sync.get(['autoCloseTab'], (result) => {
                                 if (result['autoCloseTab']) setTimeout(window.close,1000);
                             });
@@ -55,34 +55,33 @@ function insertStyle() {
     document.head.appendChild(styleElement);
 }
 
-chrome.storage.sync.get(['autoDownloadPDF'], (result) => {
-        window.addEventListener("load", function load(event) {
-                window.removeEventListener("load", load, false);
+window.addEventListener("load", function load(event) {
+        window.removeEventListener("load", load, false);
 
-                if (!document.cookie || result['autoDownloadPDF']) {
-                    const observer = new MutationObserver((mutationList) => {
-                            const title = document.querySelector("#zxxcontent > div.web-breadcrumb > div > span:nth-child(3) > span.fish-breadcrumb-link");
-                            if (title) {
-                                observer.disconnect();
-                                downloadPDF(title.innerText);
-                            }
-                        });
-                    observer.observe(document.body, { childList: true, subtree: true });
-                }
-                if (document.cookie) {
-                    const oserver = new MutationObserver((mutationList) => {
-                            const title = document.querySelector('.index-module_title_bnE9V');
-                            if (title) {
-                                oserver.disconnect();
-                                // add download button
-                                insertStyle();
-                                const div = document.createElement('div');
-                                div.innerHTML = '<button class="github-button">下载</button>';
-                                div.onclick = () => { downloadPDF(title.innerText); };
-                                title.appendChild(div);
-                            }
-                        });
-                    oserver.observe(document.querySelector("#zxxcontent"), { childList: true, subtree: true });
-                }
-            }, false);
-    });
+        if (document.querySelector("#header > div > div.index-module_header_QeURD.theme-menu-normal > div.index-module_menu-container_yzk8Y > div.index-module_menu-right_RHjOa > div.index-module_user_Zhwre")) {
+            const observer = new MutationObserver((mutationList) => {
+                    const title = document.querySelector("#zxxcontent > div.web-breadcrumb > div > span:nth-child(3) > span.fish-breadcrumb-link");
+                    if (title) {
+                        observer.disconnect();
+                        downloadPDF(title.innerText);
+                    }
+                });
+            observer.observe(document.body, { childList: true, subtree: true });
+        } else {
+            const oserver = new MutationObserver((mutationList) => {
+                    const title = document.querySelector('.index-module_title_bnE9V');
+                    if (title) {
+                        chrome.storage.sync.get(['autoDownloadPDF'], (result) => {
+                                });
+                        oserver.disconnect();
+                        // add download button
+                        insertStyle();
+                        const div = document.createElement('div');
+                        div.innerHTML = '<button class="github-button">下载</button>';
+                        div.onclick = () => { downloadPDF(title.innerText); };
+                        title.appendChild(div);
+                    }
+                });
+            oserver.observe(document.querySelector("#zxxcontent"), { childList: true, subtree: true });
+        }
+    }, false);
